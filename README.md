@@ -32,3 +32,8 @@ XX:XX:XX:XX:XX:XX   EV3
 ```
 -> % sudo rfcomm release /dev/rfcomm0
 ```
+
+Alternatively pair with PC using GUI bluetooth interface. Then start a connection to EV3 using:
+...
+-> sudo rfcomm connect 0 XX:XX:XX:XX:XX:XX 1
+...
