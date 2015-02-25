@@ -1468,6 +1468,27 @@ class DirectCommand(object):
         self._append_param(1) # Number of values
         self._append_reply_param(DataFormat.DATA32)
 
+    @safe_add
+    def add_input_device_ready_raw3(self, input_port,
+                                            mode=-1,
+                                            device_type=0,
+                                            layer=USB_CHAIN_LAYER_MASTER):
+        """Waits until the device on the specified InputPort is ready and then
+        returns its value as a raw value.
+
+        """
+        self._msg.append(Opcode.INPUT_DEVICE)
+        self._msg.append(InputDeviceSubcode.READY_RAW)
+        self._append_param(layer)
+        self._append_param(input_port)
+        self._append_param(device_type)
+        self._append_param(mode)
+        self._append_param(3) # Number of values
+        self._global_params_types.append(self._REPLY_TUPLE_OPEN_TOKEN)
+        self._append_reply_param(DataFormat.DATA32)
+        self._append_reply_param(DataFormat.DATA32)
+        self._append_reply_param(DataFormat.DATA32)
+        self._global_params_types.append(self._REPLY_TUPLE_CLOSE_TOKEN)
 
     @safe_add
     def add_input_device_ready_percent(self, input_port,
