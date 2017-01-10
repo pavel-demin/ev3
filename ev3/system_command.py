@@ -93,7 +93,7 @@ def write_mailbox(ev3_obj, mailbox_name_str, byte_seq):
     if ('\0' != mailbox_name_str[-1]):
         mailbox_name_str += '\0'
 
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_NO_REPLY)
     cmd.append(Command.WRITEMAILBOX)
 

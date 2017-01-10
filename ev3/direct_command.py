@@ -1012,7 +1012,8 @@ class DirectCommand(object):
         self._global_params_byte_count = 0
 
         # Allocate space for the CommandType.
-        self._msg = [0x00]
+        self._msg = bytearray()
+        self._msg.append(0x00)
 
         # Allocate space for global and local param lengths.
         self._msg.append(0x00)
