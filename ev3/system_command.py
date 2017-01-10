@@ -190,7 +190,7 @@ def download_file(ev3_obj, save_path_str, file_data):
 
     reply = ev3_obj.send_message_for_reply(cmd)
 
-    print 'reply: ', reply
+    print('reply: ', reply)
 
     if (reply[0] == ReplyType.SYSTEM_REPLY_ERROR):
         raise SystemCommandError('A command failed.')

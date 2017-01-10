@@ -11,7 +11,7 @@ EXAMPLE USAGE:
 
     def keep_alive_finished(result):
         global finished
-        print 'The keep_alive() function returned: ', result
+        print('The keep_alive() function returned: ', result)
         finished = True
 
 
@@ -23,11 +23,11 @@ EXAMPLE USAGE:
                 async_thread.put(brick.keep_alive, keep_alive_finished)
 
                 while (not finished):
-                    print 'Waiting...'
+                    print('Waiting...')
                     time.sleep(0.1)
 
         except ev3.EV3Error as ex:
-            print 'An error occurred: ', ex
+            print('An error occurred: ', ex)
 
         async_thread.stop()
 
