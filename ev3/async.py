@@ -35,8 +35,7 @@ EXAMPLE USAGE:
 
 
 import threading
-import Queue
-
+from multiprocessing import Queue
 
 class AsyncThread(threading.Thread):
     """A simple thread subclass maintains a queue of functions to call."""

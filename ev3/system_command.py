@@ -26,7 +26,7 @@ Byte 7 - N: payload
 import itertools
 
 
-import message
+from ev3 import message
 
 
 MAX_REPLY_BYTES = 1014  # According to c_com.h comments.

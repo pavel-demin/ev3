@@ -52,8 +52,8 @@ Byte 5 - n: Response buffer (global variable values)
 """
 
 
-import ev3
-import message
+from ev3 import ev3
+from ev3 import message
 
 
 MAX_CMD_LEN = 1019          # The size of the brick's txBuf is 1024 bytes but

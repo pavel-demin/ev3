@@ -6,8 +6,8 @@ with message variable types.
 
 import struct
 
-import system_command
-import direct_command
+import ev3.system_command
+import ev3.direct_command
 
 
 class MessageError(Exception):

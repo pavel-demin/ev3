@@ -44,9 +44,9 @@ Prerequisites:
 
 import serial
 
-import message
-import system_command
-import direct_command
+from ev3 import message
+from ev3 import system_command
+from ev3 import direct_command
 
 
 class KnownPaths(object):
