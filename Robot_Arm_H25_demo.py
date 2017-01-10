@@ -97,28 +97,28 @@ swivel_right_cmd.add_keep_alive()
 
 if ("__main__" == __name__):
     with ev3.EV3() as brick:
-        print "Connection opened (press 'q' to quit)."
+        print("Connection opened (press 'q' to quit).")
 
         while (True):
             c = getch()
 
             if ('c' == c):
-                print 'Opening claw.'
+                print('Opening claw.')
                 open_claw_cmd.send(brick)
             elif ('v' == c):
-                print 'Closing claw.'
+                print('Closing claw.')
                 close_claw_cmd.send(brick)
             elif ('w' == c):
-                print 'Raising claw.'
+                print('Raising claw.')
                 raise_claw_cmd.send(brick)
             elif ('s' == c):
-                print 'Lowering claw.'
+                print('Lowering claw.')
                 lower_claw_cmd.send(brick)
             elif ('a' == c):
-                print 'Swivel left.'
+                print('Swivel left.')
                 swivel_left_cmd.send(brick)
             elif ('d' == c):
-                print 'Swivel right.'
+                print('Swivel right.')
                 swivel_right_cmd.send(brick)
             elif ('q' == c):
                 break
