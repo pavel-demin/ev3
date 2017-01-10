@@ -83,13 +83,12 @@ def parse_str(byte_seq, index, length=None):
 
 def parse_null_terminated_str(byte_seq, index, length):
     """Parses a null-terminated string of up to length chars."""
-    result = []
-    for i in range(index, (index + length)):
-        if (0x00 != byte_seq[i]):
-            result.append(chr(byte_seq[i]))
-        else:
+    result = bytearray()
+    for i in range(index, index + length):
+        if (0x00 == byte_seq[i]):
             break
-    return ''.join(result)
+        result.extend(byte_seq[i])
+    return result
 
 def parse_float(byte_seq, index):
     """Parses a 32bit floating point number."""
