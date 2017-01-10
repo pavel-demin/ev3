@@ -17,9 +17,9 @@ The code assumes the following wiring configuration:
     Port 4 - Forward facing touch sensor
 
 """
-import ev3
-import direct_command
+
 import time
+from ev3 import *
 
 # move robot
 def mv_rbt(direction,turn_ratio,step):
@@ -42,7 +42,7 @@ def rd_snr():
     snr.add_input_device_get_bumps(3)    
     with ev3.EV3() as brick:
         x = snr.send(brick)
-        print x
+        print(x)
         return x
 
 def rst_tch():
