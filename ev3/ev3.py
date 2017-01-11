@@ -82,16 +82,16 @@ class EV3(object):
         """Opens the object's serial port."""
         if (self._port is None):
             self._port = serial.Serial(port=self._port_str,
-                                        baudrate=self.RFCOMM_BAUDRATE,
-                                        bytesize=serial.EIGHTBITS,
-                                        parity=serial.PARITY_NONE,
-                                        stopbits=serial.STOPBITS_ONE,
-                                        timeout=None,
-                                        xonxoff=False,
-                                        rtscts=False,
-                                        writeTimeout=None,
-                                        dsrdtr=False,
-                                        interCharTimeout=None)
+                                       baudrate=self.RFCOMM_BAUDRATE,
+                                       bytesize=serial.EIGHTBITS,
+                                       parity=serial.PARITY_NONE,
+                                       stopbits=serial.STOPBITS_ONE,
+                                       timeout=None,
+                                       xonxoff=False,
+                                       rtscts=False,
+                                       writeTimeout=None,
+                                       dsrdtr=False,
+                                       interCharTimeout=None)
 
 
     def close(self):
@@ -122,9 +122,7 @@ class EV3(object):
 
         """
         try:
-            return message.send_message_for_reply(self._port,
-                                                            msg,
-                                                            message_counter)
+            return message.send_message_for_reply(self._port, msg, message_counter)
         except message.MessageError as ex:
             raise EV3Error(ex.message)
 
@@ -137,10 +135,8 @@ class EV3(object):
         """
         result = dir(type(self))
         result += list(self.__dict__)
-        result += [s for s in list(system_command.__dict__)
-                                                    if not s.startswith('_')]
-        result += [s[4:] for s in list(direct_command.DirectCommand.__dict__)
-                                                        if s.startswith('add_')]
+        result += [s for s in list(system_command.__dict__) if not s.startswith('_')]
+        result += [s[4:] for s in list(direct_command.DirectCommand.__dict__) if s.startswith('add_')]
         return sorted(set(result))
 
 
