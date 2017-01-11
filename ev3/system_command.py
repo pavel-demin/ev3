@@ -23,13 +23,10 @@ Byte 7 - N: payload
 """
 
 
-import itertools
-
-
 from ev3 import message
 
 
-MAX_REPLY_BYTES = 1014  # According to c_com.h comments.
+MAX_REPLY_BYTES = 1012
 MAX_TX_BYTES = 1016
 
 
@@ -101,7 +98,7 @@ def write_mailbox(ev3_obj, mailbox_name_str, byte_seq):
     message.append_str(cmd, mailbox_name_str)
 
     message.append_u16(cmd, len(byte_seq))
-    map(cmd.append, byte_seq)
+    cmd.extend(byte_seq)
 
     ev3_obj.send_message(cmd)
 
@@ -153,8 +150,8 @@ def upload_file(ev3_obj, path_str, save_path_str=None):
         result += _continue_upload_file(ev3_obj, handle)
 
     if (save_path_str is not None):
-        with open(save_path_str, 'w') as out_file:
-            out_file.write(message.parse_str(result, 0, len(result)))
+        with open(save_path_str, 'wb') as out_file:
+            out_file.write(result)
     else:
         return tuple(result)
 
@@ -168,8 +165,8 @@ def download_file_from_path(ev3_obj, save_path_str, file_path_str):
     if (not isinstance(file_path_str, str)):
         raise ValueError('The data_path_str param must be of type str.')
 
-    with open(file_path_str, 'r') as read_file:
-        return download_file(ev3_obj, read_file.read(), save_path_str)
+    with open(file_path_str, 'rb') as read_file:
+        return download_file(ev3_obj, save_path_str, read_file.read())
 
 
 def download_file(ev3_obj, save_path_str, file_data):
@@ -181,7 +178,7 @@ def download_file(ev3_obj, save_path_str, file_data):
     if (not isinstance(save_path_str, str)):
         raise ValueError('The save_path_str param must be of type str.')
 
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_REPLY)
     cmd.append(Command.BEGIN_DOWNLOAD)
 
@@ -189,8 +186,6 @@ def download_file(ev3_obj, save_path_str, file_data):
     message.append_str(cmd, save_path_str)
 
     reply = ev3_obj.send_message_for_reply(cmd)
-
-    print('reply: ', reply)
 
     if (reply[0] == ReplyType.SYSTEM_REPLY_ERROR):
         raise SystemCommandError('A command failed.')
@@ -208,7 +203,7 @@ def download_file(ev3_obj, save_path_str, file_data):
 
 def create_dir(ev3_obj, path_str):
     """Creates the directory at the given path_str."""
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_NO_REPLY)
     cmd.append(Command.CREATE_DIR)
     message.append_str(cmd, path_str)
@@ -221,7 +216,7 @@ def delete_path(ev3_obj, path_str):
     NOTE:   Directories must be empty before they can be deleted.
 
     """
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_NO_REPLY)
     cmd.append(Command.DELETE_FILE)
     message.append_str(cmd, path_str)
@@ -254,7 +249,7 @@ def _list_files(ev3_obj, path_str):
     handle = None
     needs_continue = False
 
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_REPLY)
     cmd.append(Command.LIST_FILES)
 
@@ -281,9 +276,9 @@ def _list_files(ev3_obj, path_str):
 
 
 def _continue_list_files(ev3_obj, handle):
-    result = []
+    result = bytearray()
 
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_REPLY)
     cmd.append(Command.CONTINUE_LIST_FILES)
     cmd.append(handle)
@@ -304,7 +299,7 @@ def _continue_list_files(ev3_obj, handle):
 
         handle = reply[3]
 
-        result.append(message.parse_str(reply, 4))
+        result.extend(message.parse_str(reply, 4))
 
         if (reply[2] == ReturnCode.END_OF_FILE):
             break
@@ -316,14 +311,14 @@ def _upload_file(ev3_obj, path_str):
     handle = None
     needs_continue = False
 
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_REPLY)
     cmd.append(Command.BEGIN_UPLOAD)
 
     message.append_u16(cmd, MAX_REPLY_BYTES)
     message.append_str(cmd, path_str)
 
-    reply = ev3_obj.send_message_for_reply(cmd)
+    reply = ev3_obj.send_message_for_reply(cmd, 0)
 
     if (reply[0] == ReplyType.SYSTEM_REPLY_ERROR):
         raise SystemCommandError('A command failed.')
@@ -335,6 +330,7 @@ def _upload_file(ev3_obj, path_str):
         raise SystemCommandError('An error occurred.')
 
     data_size = message.parse_u32(reply, 3)
+
     handle = reply[7]
 
     result = reply[8:]
@@ -343,9 +339,9 @@ def _upload_file(ev3_obj, path_str):
 
 
 def _continue_upload_file(ev3_obj, handle):
-    result = []
+    result = bytearray()
 
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_REPLY)
     cmd.append(Command.CONTINUE_UPLOAD)
     cmd.append(handle)
@@ -353,7 +349,7 @@ def _continue_upload_file(ev3_obj, handle):
     message.append_u16(cmd, MAX_REPLY_BYTES)
 
     while (True):
-        reply = ev3_obj.send_message_for_reply(cmd)
+        reply = ev3_obj.send_message_for_reply(cmd, 1)
 
         if (reply[0] == ReplyType.SYSTEM_REPLY_ERROR):
             raise SystemCommandError('A command failed.')
@@ -366,12 +362,12 @@ def _continue_upload_file(ev3_obj, handle):
 
         handle = reply[3]
 
-        result.append(reply[4:])
+        result.extend(reply[4:])
 
         if (reply[2] == ReturnCode.END_OF_FILE):
             break
 
-    return itertools.chain.from_iterable(result)
+    return result
 
 
 def _continue_download_file(ev3_obj, handle, data):
@@ -379,7 +375,7 @@ def _continue_download_file(ev3_obj, handle, data):
 
     data_len = len(data)
 
-    cmd = []
+    cmd = bytearray()
     cmd.append(CommandType.SYSTEM_COMMAND_REPLY)
     cmd.append(Command.CONTINUE_DOWNLOAD)
     cmd.append(handle)
@@ -389,7 +385,7 @@ def _continue_download_file(ev3_obj, handle, data):
     else:
         offset = MAX_TX_BYTES
 
-    map(cmd.append, data[:offset])
+    cmd.extend(data[:offset])
 
     while (True):
         reply = ev3_obj.send_message_for_reply(cmd)
@@ -409,9 +405,9 @@ def _continue_download_file(ev3_obj, handle, data):
         del (cmd[3:])
 
         if (MAX_TX_BYTES >= (data_len - offset)):
-            map(cmd.append, data[offset:])
+            cmd.extend(data[offset:])
             offset = data_len
         else:
             new_offset = (offset + MAX_TX_BYTES)
-            map(cmd.append, data[offset:new_offset])
+            cmd.extend(data[offset:new_offset])
             offset = new_offset
