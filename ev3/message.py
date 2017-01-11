@@ -6,10 +6,6 @@ with message variable types.
 
 import struct
 
-from ev3 import system_command
-from ev3 import direct_command
-
-
 class MessageError(Exception):
     """Subclass for reporting errors."""
     pass
@@ -21,8 +17,6 @@ def send_message_for_reply(port, msg, message_counter=0x1234):
     header.
 
     """
-    if (not msg_expects_reply(msg)):
-        raise MessageError('The message is not a type that expects a reply.')
 
     # Message length includes the two message_counter bytes.
     msg_len = 2 + len(msg)
@@ -42,8 +36,6 @@ def send_message_for_reply(port, msg, message_counter=0x1234):
 
 def send_message_no_reply(port, msg, message_counter=0x1234):
     """Sends the message without waiting for a reply."""
-    if (msg_expects_reply(msg)):
-        raise MessageError('The message is a type that expects a reply.')
 
     # Message length includes the two message_counter bytes.
     msg_len = 2 + len(msg)
@@ -52,19 +44,6 @@ def send_message_no_reply(port, msg, message_counter=0x1234):
 
     _write_bytes(port, buf)
     _write_bytes(port, msg)
-
-def msg_expects_reply(msg):
-    """Returns True if the given message is a type that expects a reply. The
-    given message should not include the length/message_counter header.
-
-    """
-    if (system_command.CommandType.SYSTEM_COMMAND_REPLY == msg[0]):
-        return True
-
-    if (direct_command.CommandType.DIRECT_COMMAND_REPLY == msg[0]):
-        return True
-
-    return False
 
 def parse_u16(byte_seq, index):
     """Parses a u16 value at the given index from the byte_seq."""
