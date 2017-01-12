@@ -2034,6 +2034,13 @@ class DirectCommand(object):
         self._append_param(led_pattern)
 
 
+    @safe_add
+    def add_system(self, command):
+        self._msg.append(Opcode.SYSTEM)
+        self._append_param(command, ParamType.LCS)
+        self._append_reply_param(DataFormat.DATA32)
+
+
     def _parse_reply(self, buf):
         result = []
         index = 0
